@@ -1,0 +1,77 @@
+// lambda==1, assume 25yr/gen; split with chimp 5MYA --> 2e5 generations ago
+// vars needed on the commandline: \`input_mstrees\`, \`sample_size\`, \`var_h\`, \`var_s\`, \`thres_freq\`
+
+initialize() { 
+    // define parameters
+    defineConstant("LMD", 1);
+    defineConstant("MU", 1.25e-8 * LMD);
+    defineConstant("RHO", 1e-8 * LMD);
+    defineConstant("NE", asInteger(1e4 / LMD));
+    defineConstant("SEQ_LEN", 200000);
+
+	initializeMutationRate(MU);
+	initializeMutationType("m1", 0.5, "f", 0.0);
+    initializeMutationType("m2", var_h , "f", var_s * LMD );
+    m2.convertToSubstitution = F;
+	initializeGenomicElementType("g1", m1, 1.0);
+	initializeGenomicElement(g1, 0, SEQ_LEN - 1);
+    initializeRecombinationRate(RHO);
+}
+
+199999 late() {
+    sim.readFromPopulationFile(input_mstrees);
+
+    // introduce selection at t0
+    // convert neutral mutation:
+    // grep all neut mutations
+    muts = sim.mutationsOfType(m1);
+    
+    // remove fixed ones & only look at pop1
+    muts = muts[(sim.mutationFrequencies(p1, muts) > 0) & (sim.mutationFrequencies(p1, muts) < 1)];
+
+    // add location restrictions: folowing analyses will look at L/2 windows, whose centers falls on [0.25, 0.75] * L
+    muts = muts[(muts.position > 0.25 * SEQ_LEN) & (muts.position < 0.75 * SEQ_LEN)];
+    sim.outputMutations(muts);
+   
+    if (size(muts) > 0){
+        // choose one closest to center
+        min_idx = 0; gap = 1e5;
+        for (m in 1:size(muts)){
+            if (abs(muts[m-1].position - SEQ_LEN/2) <= gap){
+                min_idx = m ;
+                gap = abs(muts[m-1].position - SEQ_LEN/2);
+            }
+        }
+        mut = muts[min_idx-1] ;
+
+        // reset sel coef
+        mut.setMutationType(m2); 
+        mut.setSelectionCoeff(var_s * LMD);
+
+        sim.outputMutations(sim.mutationsOfType(m2));
+    }else{
+        // setSeed(getSeed() + 1);
+        // cat("No suitable neutral mutation found. Restarting with seed "+ getSeed() +"\n");
+        // sim.readFromPopulationFile(input_mstrees);
+        cat("Initial state stored in ", input_mstrees, "does not contain qualifying site to initiate selection.");
+        sim.simulationFinished();
+    }
+}
+
+// sample sample_size individuals every 500 generations
+200000:204000 late() {
+    // if not lost, output frequency
+    if (sim.countOfMutationsOfType(m2) > 0 ){
+     	sim.outputMutations(sim.mutationsOfType(m2)); 
+    }
+
+    if ( sim.cycle % 500 == 0){
+		cat("\nOutput time-series samples:\n");
+		p1.outputMSSample(sample_size) ;
+    } 
+
+    if ( sim.cycle == 204000 ){
+    	cat("\nOutput the most recent samples:\n");
+        p2.outputMSSample(1); 
+    }
+}
