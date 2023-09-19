@@ -1,0 +1,3 @@
+[submodule "figS13-S14_LCT/gdc"]
+	path = figS13-S14_LCT/gdc
+	url = https://github.com/mathii/gdc
