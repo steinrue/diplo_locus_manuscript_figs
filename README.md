@@ -11,7 +11,7 @@ In order for scripts in this repository to run, the Python version must be at le
 Download this repository with
 ```shell
 # download
-git clone https://github.com/steinrue/diplo_locus_manuscript_figs
+git clone --recurse-submodules https://github.com/steinrue/diplo_locus_manuscript_figs
 # enter the dir
 cd diplo_locus_manuscript_figs
 ```
