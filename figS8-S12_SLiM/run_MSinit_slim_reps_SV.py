@@ -1,24 +1,26 @@
 """Pipeline to "burn-in" with msprime, pass on to SLiM, run SLiM, and parse output
 Usage:
-python %prog <slim_input> <condition> <from> <to> <slim_args>
+python %prog <slim_input> <condition> <from_rep> <to_rep> <slim_args>
 """
 import sys, os, subprocess, re, time
 import numpy as np
-import pandas as pd
 from datetime import datetime, timedelta
 import msprime, pyslim, tskit
 
-wdir = '/gpfs/data/steinruecken-lab/XiaohengStuff/Diffusion_spect/Simulations/singleLocus/'
-# wdir = os.getcwd()
-slimpath = '/gpfs/data/steinruecken-lab/XiaohengStuff/build/slim'
+
+# wdir = 'diplolocus_manuscript_figs/figS8-S12_SLiM/'
+wdir = os.getcwd()
+# slimpath = '/gpfs/data/steinruecken-lab/XiaohengStuff/build/slim'
+# Assume user's system already registered "slim" as the command
+slimpath = 'slim'
 
 
 def get_seeds(seedfile, num_reps):
     Seeds = []
     if not os.path.exists(seedfile):
         seed_pool = np.empty((num_reps, 2))
-        seed_pool[:,0] = np.arange(num_reps)
-        seed_pool[:,1] = np.random.randint(0, 2**32 - 1, num_reps)
+        seed_pool[:, 0] = np.arange(num_reps)
+        seed_pool[:, 1] = np.random.randint(0, 2 ** 32 - 1, num_reps)
         np.savetxt(seedfile, seed_pool, fmt="%d", delimiter="\t", header="rep\tseed", comments="")
         enough = True
     else:
@@ -35,7 +37,7 @@ def get_seeds(seedfile, num_reps):
     enough |= (len(Seeds) >= num_reps)
 
     if not enough:
-        extras = np.random.randint(0, 2**32 - 1, num_reps - len(Seeds))
+        extras = np.random.randint(0, 2 ** 32 - 1, num_reps - len(Seeds))
         OG_len = len(Seeds)
         with open(seedfile, 'a') as seeds:
             for i, seed in enumerate(extras):
@@ -46,7 +48,6 @@ def get_seeds(seedfile, num_reps):
 
 
 def check_slim_dirs(condition):
-    # root_folder = f'{wdir}500kb_{condition}_ConstN/'
     root_folder = os.path.join(wdir, f'200kb_HC_{condition}_ConstN_t9x500gen')
     if not (os.path.exists(root_folder) and os.path.isdir(root_folder)):
         os.makedirs(root_folder)
@@ -127,12 +128,12 @@ def initializeHC_simple_msprime(Ne: int or float, L: int or float, mu: float, rh
     demog.add_population_split(time=int(2e5), derived=[1, 2], ancestral=0)
     # spawn 2 seeds from the given seed
     rng = np.random.RandomState(master_seed)
-    anc_seed, mut_seed = rng.randint(0, 2**32 - 1, 2)
+    anc_seed, mut_seed = rng.randint(0, 2 ** 32 - 1, 2)
     # simulate trees
     mstrees = msprime.sim_ancestry(samples={1: int(Ne), 2: int(Ne)},
                                    demography=demog, random_seed=anc_seed, recombination_rate=rec_map)
     # use pyslim to annotate lineages
-    mstrees = pyslim.annotate(mstrees, model_type="WF", tick=int(2e5-1), stage="late")
+    mstrees = pyslim.annotate(mstrees, model_type="WF", tick=int(2e5 - 1), stage="late")
     # add neutral mutations
     m1_model = msprime.SLiMMutationModel(type=1)
     mstrees = msprime.sim_mutations(mstrees, rate=mut_map, model=m1_model,
@@ -149,10 +150,10 @@ def initializeHC_simple_msprime(Ne: int or float, L: int or float, mu: float, rh
 # frac_regex = re.compile(r'(\.\d+)')
 s_regex = re.compile(r's(\.\d+)')
 h_regex = re.compile(r'h(\.{0,1}\d+)')
-f0_regex = re.compile(r'stdVar(\.\d+)')
 
 
-def get_slim_command(slim_input, condition, rep, seed, tree_file, sample_size): #, s:float=0., h: float=0.5 <-- can be extracted from cond
+def get_slim_command(slim_input, condition, rep, seed, tree_file,
+                     sample_size):  # , s:float=0., h: float=0.5 <-- can be extracted from cond
     global wdir, slimpath
     # tree_file = f'200kb_HC_{COND}_ConstN_t9x500gen/trees/rep{rep}_seed{rep_seed}.trees'
     slim_output = f'{wdir}200kb_HC_{condition}_ConstN_t9x500gen/msout/{condition}_ConstN_t9x500gen_n40_rep{rep}.msout'
@@ -168,19 +169,8 @@ def get_slim_command(slim_input, condition, rep, seed, tree_file, sample_size): 
         assert len(S) > 0 and len(H) > 0, f'Cannot parse coefficients from condition \"{condition}\".'
         S = float(S[0])
         H = float(H[0])
-        if 'sdtVar-fromSFS' in condition:
-            print(condition, S, H)
-            assert 'stdVarSFS' in slim_input, f'Not input for standing variation: {slim_input}.'
-            slim_command = f'{slimpath} -t -s {seed} -d input_mstrees=\"\'{tree_file}\'\" -d sample_size={sample_size} -d var_s={S} -d var_h={H} {slim_input} > {slim_output}'
-        elif 'stdVar' in condition and 'SFS' not in condition:
-            assert 'stdVar' in slim_input, f'Not input for standing variation: {slim_input}.'
-            f0 = f0_regex.findall(condition)
-            assert len(f0) > 0, f'Cannot extract f_0 MAF threshold from condition \"{condition}\".'
-            f0 = float(f0[0])
-            assert 0 < f0 < 1, f'Initial frequency threshold must be between 0 and 1: f0={f0}.'
-            slim_command = f'{slimpath} -t -s {seed} -d input_mstrees=\"\'{tree_file}\'\" -d sample_size={sample_size} -d var_s={S} -d var_h={H} -d thres_freq={f0} {slim_input} > {slim_output}'
-        else:
-            slim_command = f'{slimpath} -t -s {seed} -d input_mstrees=\"\'{tree_file}\'\" -d sample_size={sample_size} -d var_s={S} -d var_h={H} {slim_input} > {slim_output}'
+        print(condition, S, H)
+        slim_command = f'{slimpath} -t -s {seed} -d input_mstrees=\"\'{tree_file}\'\" -d sample_size={sample_size} -d var_s={S} -d var_h={H} {slim_input} > {slim_output}'
     return slim_command, slim_output
 
 
@@ -213,13 +203,13 @@ def track_selPos_in_msout(filename):
 
     # open file
     slimout = open(filename, 'r')
-    l = slimout.readline(); line_number += 1
+    l = slimout.readline()
+    line_number += 1
 
     # grep genome size
-    # while not re.search(r'^initializeGenomicElement\(g1', l):
     while not l.startswith('initializeGenomicElement(g1'):
-        l = slimout.readline(); line_number += 1
-    # print(l)
+        l = slimout.readline()
+        line_number += 1
     genomeSize = int(re.findall(r'[0-9]+', l)[-1])
 
     # same procedure for an arbitrary number of samples:
@@ -228,9 +218,9 @@ def track_selPos_in_msout(filename):
     T_line = ''
     while l != '':
         # go to output line "#OUT"
-        # while not re.match(r'^#OUT', l) and l != '':
         while not l.startswith('#OUT') and (l != ''):
-            l = slimout.readline(); line_number += 1
+            l = slimout.readline()
+            line_number += 1
         if l == '':
             break
         # now l == "#OUT: 199999 199999 T p1 740 m1 50045 0 0.5 p-1 -2 6"
@@ -239,11 +229,11 @@ def track_selPos_in_msout(filename):
         # tracking alleles:
         ## sample tracking output[annotation]:
         # #OUT:[0] 17101[1cycle] 17101[2generation] T[3tracking] p1[4subpop] 72820[5mutation id] m2[6mut type] 10000[7position] 0.02[8s] 0.5[9h] p1[10origin pop] 17099[11t0] 2[12#copy]
-        if len(line) < 4: # <-- most likely eof
+        if len(line) < 4:  # <-- most likely eof
             print(line)
             continue
         elif line[3] == 'T' and line[4] == 'p1' and line[6] == 'm2':
-            T_line = [str(line_number)+":"] + line
+            T_line = [str(line_number) + ":"] + line
             # in the case of standing variation:
             if not found_t0:  # last_id == line[5] and
                 # print(f'found_t0 == {found_t0}, target_pos == {target_pos}')
@@ -304,8 +294,10 @@ def track_selPos_in_msout(filename):
             sampleSize = int(line[-1])
             Sizes.append(sampleSize)
             # next next line
-            l = slimout.readline(); line_number += 1  # //
-            l = slimout.readline(); line_number += 1
+            l = slimout.readline()
+            line_number += 1  # //
+            l = slimout.readline()
+            line_number += 1
             numSites.append(int(l.strip().split(' ')[-1]))
             # record positions
             l_pos = slimout.readline().strip().split(' ')[1:]
@@ -314,8 +306,8 @@ def track_selPos_in_msout(filename):
             # get idx for target pos
             print(target_pos, found_t0)
             if target_pos is not None:
-                if (target_pos -1) in positions:
-                    target_idx = positions.index(target_pos -1)
+                if (target_pos - 1) in positions:
+                    target_idx = positions.index(target_pos - 1)
                 elif target_pos in positions:
                     target_idx = positions.index(target_pos)
                 else:
@@ -335,11 +327,12 @@ def track_selPos_in_msout(filename):
 
             # start recording *the* selected site
             for i in range(sampleSize):
-                l = slimout.readline(); line_number += 1
-                ind = l.strip() # single hap
+                l = slimout.readline()
+                line_number += 1
+                ind = l.strip()  # single hap
                 try:
                     assert len(ind) == numSites[pop_index], f'len(ind) = {len(ind)}, ' \
-                                                        f'pop_index = {pop_index}'
+                                                            f'pop_index = {pop_index}'
                 except Exception as e:
                     print(e)
                     print(f'len(ind) = {len(ind)}, pop_index = {pop_index}, len(numSites) = {len(numSites)}')
@@ -350,16 +343,19 @@ def track_selPos_in_msout(filename):
         elif line[3] == 'SM' and line[4] == 'p2':  # ref pop
             assert line[-1] == '1'
             # next next line
-            l = slimout.readline(); line_number += 1  # //
-            l = slimout.readline(); line_number += 1
+            l = slimout.readline()
+            line_number += 1  # //
+            l = slimout.readline()
+            line_number += 1
             # numSites.append(int(l.strip().split(' ')[-1]))
             # record positions
-            l = slimout.readline(); line_number += 1
+            l = slimout.readline()
+            line_number += 1
             positions = l.strip().split(' ')[1:]
             positions = [int(genomeSize * float(i)) for i in positions]
 
             # if target site is 1 here, flip samples
-            if (target_pos -1) in positions:
+            if (target_pos - 1) in positions:
                 Samples = [Sizes[i] - count for i, count in enumerate(Samples)]
 
             # record dup:
@@ -371,10 +367,11 @@ def track_selPos_in_msout(filename):
             # no need to read the next line bc it's all "1"s
 
         # read next line
-        l = slimout.readline(); line_number += 1
+        l = slimout.readline()
+        line_number += 1
 
         if l.startswith('Mutation lost'):
-            print(l)   # <-- sometimes it can be "Mutation lost. Terminating simulation."
+            print(l)  # <-- sometimes it can be "Mutation lost. Terminating simulation."
             if 'estart' in l:
                 # clean slate
                 restart_counter += 1
@@ -416,7 +413,6 @@ def track_selPos_in_msout(filename):
 
 
 def main():
-    # seed_file = sys.argv[1]
     num_reps = 200
     slim_input = sys.argv[1]
     COND = sys.argv[2]
@@ -431,7 +427,7 @@ def main():
     check_slim_dirs(condition=COND)
 
     # read seeds
-    seed_file = f'{wdir}slim4_input/{(LEN/1e3):g}kb_HC_{COND}_ConstN_t9x500gen_simSeeds.txt'
+    seed_file = f'{wdir}slim4_input/{(LEN / 1e3):g}kb_HC_{COND}_ConstN_t9x500gen_simSeeds.txt'
     Seeds = get_seeds(seed_file, num_reps)
     print(len(Seeds))
     # sanity check
@@ -442,7 +438,7 @@ def main():
     for rep in range(from_rep, to_rep + 1):
         rep_seed = Seeds[rep]
         # tree file name
-        tree_file = f'{(LEN/1e3):g}kb_HC_{COND}_ConstN_t9x500gen/trees/rep{rep}_seed{rep_seed}.trees'
+        tree_file = f'{(LEN / 1e3):g}kb_HC_{COND}_ConstN_t9x500gen/trees/rep{rep}_seed{rep_seed}.trees'
         # slim stuff
         slim_command, slim_msout = get_slim_command(slim_input, COND, rep, rep_seed, tree_file, sample_size=40)
         last = datetime.now()
@@ -519,7 +515,7 @@ def main():
                 rerun_count += 1
                 rep_seed += 1
                 ## tree file name
-                tree_file = f'{(LEN/1e3):g}kb_HC_{COND}_ConstN_t9x500gen/trees/rep{rep}_seed{rep_seed}.trees'
+                tree_file = f'{(LEN / 1e3):g}kb_HC_{COND}_ConstN_t9x500gen/trees/rep{rep}_seed{rep_seed}.trees'
                 ## slim stuff
                 slim_command, slim_msout = get_slim_command(slim_input, COND, rep, rep_seed, tree_file, sample_size=40)
                 new_run |= True
@@ -531,17 +527,17 @@ def main():
               f'{print_timedelta(datetime.now() - last)}\n\n')
 
         # remove files associated with the old rep
-        parsed_count = f'{(LEN/1e3):g}kb_HC_{COND}_ConstN_t9x500gen/count/HC_{COND}_ConstN_t9x500gen_n40_rep{rep}.count'
+        parsed_count = f'{(LEN / 1e3):g}kb_HC_{COND}_ConstN_t9x500gen/count/HC_{COND}_ConstN_t9x500gen_n40_rep{rep}.count'
 
         if new_run:
             print(f'Overwrite old simulation for rep {rep}')
             if os.path.exists(parsed_count):
                 os.remove(parsed_count)
-            # just outsource then
-            ls_command = f'ls {wdir}{(LEN/1e3):g}kb_HC_{COND}_ConstN_t9x500gen/likelihood/*_rep{rep}_* | wc -l '
+            # just outsource then ##<---some os function could do this too
+            ls_command = f'ls {wdir}{(LEN / 1e3):g}kb_HC_{COND}_ConstN_t9x500gen/likelihood/*_rep{rep}_* | wc -l '
             file_count = subprocess.check_output(ls_command, shell=True)
             if int(file_count) > 0:
-                rm_command = f'rm {wdir}{(LEN/1e3):g}kb_HC_{COND}_ConstN_t9x500gen/likelihood/*_rep{rep}_*'
+                rm_command = f'rm {wdir}{(LEN / 1e3):g}kb_HC_{COND}_ConstN_t9x500gen/likelihood/*_rep{rep}_*'
                 rm_stdout = subprocess.check_output(rm_command, shell=True)
                 print(rm_stdout.decode())
 

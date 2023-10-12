@@ -1,14 +1,10 @@
-"""Collect DL simulation pkls, compute and plot LR-based ROCs
+"""Collect DL simulation pkls, plot LLR-based qqplots against standard chi-square
 Usage:
-python %prog <generic_s2_pkl> <generic_s1_pkl> <sim_init> <fig_prefix>
+python %prog <freq_pkl> <sv_pkl> <fig_name>
 """
 import pickle, sys, re, subprocess
 import numpy as np
-import pandas as pd
-import seaborn as sns
 import matplotlib.pyplot as plt
-# local import
-from diplo_locus.utility import _reformat_LL_DF_to_matrix
 
 
 # prepare to extract

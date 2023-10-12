@@ -4,10 +4,9 @@ import warnings
 
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 
-import sys, time, os, re, pickle
+import sys, os, re
 import numpy as np
 import pandas as pd
-import seaborn as sns
 import matplotlib.pyplot as plt
 
 
@@ -144,34 +143,24 @@ def plot_bothS_rocs_fromDF_wrapper(figname_prefix, s2_DF, s1_DF, H_2plot, true_s
 
 
 def main():
-    # ABSL_PATH = '/gpfs/data/steinruecken-lab/XiaohengStuff/Diffusion_spect/Simulations/singleLocus/'  #
     s2_scoreFile = sys.argv[1]
     if not os.path.exists(s2_scoreFile):
         raise FileNotFoundError(s2_scoreFile)
     s1_scoreFile = sys.argv[2]
     if not os.path.exists(s1_scoreFile):
         raise FileNotFoundError(s1_scoreFile)
-    stdVar = sys.argv[3]
-    if stdVar == "sfs":
-        sv_insert = '_stdVarSFS'
-        vars2_slist = ['.0', '.001', '.002', '.005']  # , '.01', '.02', '.05'
-        vars1_slist = ['.0002', '.0004', '.0006', '.0008', '.001']  # , '.01', '.02', '.05'
-        simGroup = 'Selection on standing variation with f > 0.1, restart from after msprime'
-    elif stdVar == "new":
-        sv_insert = '_newSV'
-        vars2_slist = ['.0', '.001', '.002', '.003', '.004', '.005']  # , '.01', '.02', '.05'
-        vars1_slist = ['.0', '.0002', '.0004', '.0006', '.0008', '.001']  # , '.01', '.02', '.05'
-        simGroup = 'Selection on standing variation'
-    else:
-        return False
 
-    fig_prefix = sys.argv[4]
+    vars2_slist = ['.0', '.001', '.002', '.003', '.004', '.005']
+    vars1_slist = ['.0', '.0002', '.0004', '.0006', '.0008', '.001']
+    simGroup = 'Selection on standing variation'
 
-    vars2_Cond_list = [f's{s}_h{h}{sv_insert}'
+    fig_prefix = sys.argv[3]
+
+    vars2_Cond_list = [f's{s}_h{h}'
                        for s in vars2_slist
                        for h in ['.5', '0', '1']
                        if f's{s}_h{h}' not in ['s.0_h0', 's.0_h1']]
-    vars1_Cond_list = [f's{s}_h5{sv_insert}' for s in vars1_slist] + [f's.0_h.5{sv_insert}']
+    vars1_Cond_list = [f's{s}_h5' for s in vars1_slist] + [f's.0_h.5']
 
     if 'select' in s2_scoreFile:
         sites = 'LLR of selection target'
@@ -194,13 +183,13 @@ def main():
     s1_scores.shat = s1_scores.shat.astype(float) * s1_scores.h.astype(float)
 
     # now plot ROCs
-    plot_varS2_rocs_fromDF_wrapper(f'{fig_prefix}_200kb_t9x500gen_n40{sv_insert}_off-Grid',
+    plot_varS2_rocs_fromDF_wrapper(f'{fig_prefix}_200kb_t9x500gen_n40_off-Grid',
                                    s2_scores, H_2plot=['0', '0.5', '1'],
                                    true_s_2plot=s2_scores.s2.unique(), panel_labs=["A", "B", "C"],
                                    which_s='s2', group=simGroup + '. ' + sites)
     # clear the slate
     plt.clf()
-    plot_bothS_rocs_fromDF_wrapper(f'{fig_prefix}_200kb_t9x500gen_n40{sv_insert}_varS2+varS1_off-Grid',
+    plot_bothS_rocs_fromDF_wrapper(f'{fig_prefix}_200kb_t9x500gen_n40_varS2+varS1_off-Grid',
                                    s2_scores, s1_scores, H_2plot=[['0', '0.5', '1'], ['5']],
                                    true_s_2plot=[s2_scores.s2.unique(), s1_scores.s1.unique()],
                                    panel_labs=["A", "B", "C", "D"],

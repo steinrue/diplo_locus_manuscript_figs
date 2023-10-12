@@ -1,18 +1,15 @@
 #!/usr/bin/env python -W ignore::DeprecationWarning
-"""collect LRs of 1) selected site and 2) site with highest MLR on each replicate"""
+"""collect LRs of 1) selected site and 2) site with highest MLR on each replicate
+Usage:
+python %prog <minMAF> <name_prefix> [s1]
+"""
 import warnings
 
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 
-import sys, time, os, re, pickle
+import sys, time, os, re
 import numpy as np
 import pandas as pd
-import seaborn as sns
-import matplotlib.pyplot as plt
-# local imports
-import diplo_locus.likelihood as likelihood
-import diplo_locus.simulate as simulate
-from diplo_locus.utility import _reformat_LL_DF_to_matrix
 
 rep_regex = re.compile(r'rep([0-9]+)-')
 pos_regex = re.compile(r'-([0-9]{4,})$')
@@ -34,8 +31,9 @@ def _extract_rep_selPos_fromCounts(filename):
             if line_idx == 1:
                 # t0, sel_pos, tk = int_regex.findall(line)
                 ints = [n for n in int_regex.findall(line) if n != '']
-                assert (len(ints) == 3) or (len(ints) == 4), f'Extract {len(ints)} digit strings ({ints}) from line {line_idx + 1}:' \
-                                                             f'{line}\n{filename}'
+                assert (len(ints) == 3) or (
+                            len(ints) == 4), f'Extract {len(ints)} digit strings ({ints}) from line {line_idx + 1}:' \
+                                             f'{line}\n{filename}'
                 sel_pos = int(ints[1])
             elif line_idx > 1:
                 break
@@ -150,13 +148,15 @@ def extract_MLRs_for_poslist(mlrfilename, pos_list, sel_pos, on_off_grid, cand_r
         scores = scores[scores.position.isin(pos_list)]
         SelPos_pd = scores[scores.position == (sel_pos - 1)].reindex()
         # print(SelPos_pd)
-        SelPos_pdRow = [int(SelPos_pd.position), float(SelPos_pd.ongrid_shat), float(SelPos_pd.shat), float(SelPos_pd.MLR)]
+        SelPos_pdRow = [int(SelPos_pd.position), float(SelPos_pd.ongrid_shat), float(SelPos_pd.shat),
+                        float(SelPos_pd.MLR)]
         # SelPos_pdRow = [SelPos_pd.position[0], SelPos_pd.ongrid_shat[0], SelPos_pd.shat[0], SelPos_pd.MLR[0]]
         # print(SelPos_pdRow)
     elif sel_pos in pos_list:
         scores = scores[scores.position.isin(pos_list)]
         SelPos_pd = scores[scores.position == sel_pos].reindex()
-        SelPos_pdRow = [int(SelPos_pd.position), float(SelPos_pd.ongrid_shat), float(SelPos_pd.shat), float(SelPos_pd.MLR)]
+        SelPos_pdRow = [int(SelPos_pd.position), float(SelPos_pd.ongrid_shat), float(SelPos_pd.shat),
+                        float(SelPos_pd.MLR)]
         # SelPos_pdRow = [SelPos_pd.position[0], SelPos_pd.ongrid_shat[0], SelPos_pd.shat[0], SelPos_pd.MLR[0]]
         # print(SelPos_pdRow)
     else:
@@ -179,7 +179,7 @@ def extract_MLRs_for_poslist(mlrfilename, pos_list, sel_pos, on_off_grid, cand_r
             left_bnd, right_bnd = (sel_pos - cand_range), (sel_pos + cand_range)
             if left_bnd < 0 or right_bnd > seq_len:
                 raise ValueError(f'target-centered window ({sel_pos} +- {cand_range})'
-                                 f'fall outside of the {seq_len/1e3:g}kb sequence:\n{mlrfilename}')
+                                 f'fall outside of the {seq_len / 1e3:g}kb sequence:\n{mlrfilename}')
             scores = scores[(scores.position >= int(left_bnd)) & (scores.position <= int(right_bnd))]
     scores = scores.reindex()  # range(1, scores.shape[0]+1)
     maxPos_pd = scores.loc[scores['MLR'].idxmax()]
@@ -189,90 +189,74 @@ def extract_MLRs_for_poslist(mlrfilename, pos_list, sel_pos, on_off_grid, cand_r
 
 
 def main():
-    ABSL_PATH = '/gpfs/data/steinruecken-lab/XiaohengStuff/Diffusion_spect/Simulations/singleLocus/'  #
-    s2_list = ['.0','.001', '.002', '.005', '.01', '.02']  # , '.05'
-    h_list = ['0', '.5', '1']  #, '5'
-    # Cond_list = [f's{s2}_h{h}' for s2 in s2_list for h in h_list]
+    # wdir = 'diplolocus_manuscript_figs/figS8-S12_SLiM/'
+    wdir = os.getcwd()
+
     repN = 200
-    # on_off_grid = sys.argv[1]
     on_off_grid = "off"
-    stdVar = sys.argv[1]
-    llInit = sys.argv[2] # Unif or Freq
-    poolMAF = sys.argv[3]
+    # llInit = sys.argv[1] # Unif or Freq
+    llInit = "Unif"
+    poolMAF = sys.argv[1]
     poolMAF = float(poolMAF)
     assert 0 <= poolMAF < 1
-    filter_tag = f'_NotLost_minMAF{str(poolMAF)[1:]}'
-    # CENTER_POS = 100000
-    if stdVar == 'sv':
-        sv_insert = '_stdVar'
-    elif stdVar == 'denovo':
-        sv_insert = ''
-    elif stdVar == "sv01":
-        sv_insert = '_stdVar.01'
-    elif stdVar == "sfs":
-        sv_insert = '_stdVarSFS'
-        s2_list = ['.0', '.001', '.002', '.005']  # , '.003', '.004', '.05', '.01', '.02'
-        h_list = ['0', '.5', '1']  #, '5'
-    elif stdVar == "new":
-        sv_insert = '_newSV'
-        s2_list = ['.0', '.001', '.002', '.003', '.004', '.005']  # , '.05', '.01', '.02'
-        h_list = ['0', '.5', '1']  #, '5'
-    else:
-        return False
+    filter_tag = f'_minMAF{str(poolMAF)[1:]}'
+    name_prefix = sys.argv[2]
 
     if 's1' in sys.argv:
-        s2_list = ['.0', '.0002', '.0004', '.0006', '.0008', '.001']  #
-        h_list = ['5', '.5']
         which_s = 's1'
+        s2_list = ['.0', '.0002', '.0004', '.0006', '.0008', '.001']
+        h_list = ['5', '.5']
     else:
         which_s = 's2'
+        s2_list = ['.0', '.001', '.002', '.003', '.004', '.005']
+        h_list = ['0', '.5', '1']
 
     # collect max scores for each scenario and write to file
-    meta_maxFile = f'{ABSL_PATH}DL-var{which_s.upper()}_maxLR-sites{filter_tag}_200kb_t9x500gen_n40{sv_insert}_{len(h_list)}h{len(s2_list)}s_Concatenated_{on_off_grid}Grid_Dist.tsv.gz'
-    meta_selFile = f'{ABSL_PATH}DL-var{which_s.upper()}_selected-sites{filter_tag}_200kb_t9x500gen_n40{sv_insert}_{len(h_list)}h{len(s2_list)}s_Concatenated_{on_off_grid}Grid_Dist.tsv.gz'
+    meta_maxFile = f'{wdir}{name_prefix}-var{which_s.upper()}_maxLR-sites{filter_tag}_200kb_t9x500gen_n40_{len(h_list)}h{len(s2_list)}s_Concatenated_{on_off_grid}Grid_Dist.tsv.gz'
+    meta_selFile = f'{wdir}{name_prefix}-var{which_s.upper()}_selected-sites{filter_tag}_200kb_t9x500gen_n40_{len(h_list)}h{len(s2_list)}s_Concatenated_{on_off_grid}Grid_Dist.tsv.gz'
     if not os.path.exists(meta_maxFile) or not os.path.exists(meta_selFile) or ('recount' in sys.argv):
         # prep two containers, one for known selected site, another for maxMLR site
         Selected_sites = pd.DataFrame(columns=['Condition', 's2', 'h', 'rep', 'position', 'ongrid_shat', 'shat', 'MLR'])
         maxMLR_sites = pd.DataFrame(columns=['Condition', 's2', 'h', 'rep', 'position', 'ongrid_shat', 'shat', 'MLR'])
         counter = 0
         # read all data
-        # for cond in Cond_list:, 's.001_h5',, 's.0_h5'
         for s in s2_list:
             for h in h_list:
                 if 's1' in sys.argv:
                     if (h != '5') and (f's{s}_h{h}' != 's.0_h.5'):
                         continue
                     elif f's{s}_h{h}' == 's.0_h5':
-                        cond = f's.0_h.5{sv_insert}'  #
+                        cond = f's.0_h.5'  #
                         print(cond)
-                        batch_selFile = f'{ABSL_PATH}200kb_HC_{cond}_ConstN_t9x500gen/DL_maxMLRs-selPos{filter_tag}_200kb_{cond}_fixH{h}_51xgeom75e-2_{llInit}_{repN}reps.tsv'
-                        batch_maxFile = f'{ABSL_PATH}200kb_HC_{cond}_ConstN_t9x500gen/DL_maxMLRs-maxPos{filter_tag}_200kb_{cond}_fixH{h}_51xgeom75e-2_{llInit}_{repN}reps.tsv'
+                        batch_selFile = f'{wdir}200kb_HC_{cond}_ConstN_t9x500gen/{name_prefix}_maxMLRs-selPos{filter_tag}_200kb_{cond}_fixH{h}_51xgeom75e-2_{llInit}_{repN}reps.tsv'
+                        batch_maxFile = f'{wdir}200kb_HC_{cond}_ConstN_t9x500gen/{name_prefix}_maxMLRs-maxPos{filter_tag}_200kb_{cond}_fixH{h}_51xgeom75e-2_{llInit}_{repN}reps.tsv'
                     else:
-                        cond = f's{s}_h{h}{sv_insert}'  #
+                        cond = f's{s}_h{h}'  #
                         print(cond)
-                        batch_selFile = f'{ABSL_PATH}200kb_HC_{cond}_ConstN_t9x500gen/DL_maxMLRs-selPos{filter_tag}_200kb_{cond}_fixH5_51xgeom75e-2_{llInit}_{repN}reps.tsv'
-                        batch_maxFile = f'{ABSL_PATH}200kb_HC_{cond}_ConstN_t9x500gen/DL_maxMLRs-maxPos{filter_tag}_200kb_{cond}_fixH5_51xgeom75e-2_{llInit}_{repN}reps.tsv'
+                        batch_selFile = f'{wdir}200kb_HC_{cond}_ConstN_t9x500gen/{name_prefix}_maxMLRs-selPos{filter_tag}_200kb_{cond}_fixH5_51xgeom75e-2_{llInit}_{repN}reps.tsv'
+                        batch_maxFile = f'{wdir}200kb_HC_{cond}_ConstN_t9x500gen/{name_prefix}_maxMLRs-maxPos{filter_tag}_200kb_{cond}_fixH5_51xgeom75e-2_{llInit}_{repN}reps.tsv'
                 elif f's{s}_h{h}' not in ['s.0_h0', 's.0_h1']:
-                    cond = f's{s}_h{h}{sv_insert}'  #, 's.0_h5'
+                    cond = f's{s}_h{h}'  # , 's.0_h5'
                     print(cond)
-                    batch_selFile = f'{ABSL_PATH}200kb_HC_{cond}_ConstN_t9x500gen/DL_maxMLRs-selPos{filter_tag}_200kb_{cond}_fixH{h}_51xgeom75e-2_{llInit}_{repN}reps.tsv'
-                    batch_maxFile = f'{ABSL_PATH}200kb_HC_{cond}_ConstN_t9x500gen/DL_maxMLRs-maxPos{filter_tag}_200kb_{cond}_fixH{h}_51xgeom75e-2_{llInit}_{repN}reps.tsv'
+                    batch_selFile = f'{wdir}200kb_HC_{cond}_ConstN_t9x500gen/DL_maxMLRs-selPos{filter_tag}_200kb_{cond}_fixH{h}_51xgeom75e-2_{llInit}_{repN}reps.tsv'
+                    batch_maxFile = f'{wdir}200kb_HC_{cond}_ConstN_t9x500gen/DL_maxMLRs-maxPos{filter_tag}_200kb_{cond}_fixH{h}_51xgeom75e-2_{llInit}_{repN}reps.tsv'
                 else:
                     assert f's{s}_h{h}' in ['s.0_h0', 's.0_h1', 's.0_h5'], f's{s}_h{h}'
-                    cond = f's.0_h.5{sv_insert}'  #
+                    cond = f's.0_h.5'  #
                     print(cond)
-                    batch_selFile = f'{ABSL_PATH}200kb_HC_{cond}_ConstN_t9x500gen/DL_maxMLRs-selPos{filter_tag}_200kb_{cond}_fixH{h}_51xgeom75e-2_{llInit}_{repN}reps.tsv'
-                    batch_maxFile = f'{ABSL_PATH}200kb_HC_{cond}_ConstN_t9x500gen/DL_maxMLRs-maxPos{filter_tag}_200kb_{cond}_fixH{h}_51xgeom75e-2_{llInit}_{repN}reps.tsv'
+                    batch_selFile = f'{wdir}200kb_HC_{cond}_ConstN_t9x500gen/DL_maxMLRs-selPos{filter_tag}_200kb_{cond}_fixH{h}_51xgeom75e-2_{llInit}_{repN}reps.tsv'
+                    batch_maxFile = f'{wdir}200kb_HC_{cond}_ConstN_t9x500gen/DL_maxMLRs-maxPos{filter_tag}_200kb_{cond}_fixH{h}_51xgeom75e-2_{llInit}_{repN}reps.tsv'
                 # print(batch_maxFile, batch_selFile)
                 batch_Selected_sites = pd.DataFrame(columns=['rep', 'position', 'ongrid_shat', 'shat', 'MLR'])
                 batch_maxMLR_sites = pd.DataFrame(columns=['rep', 'position', 'ongrid_shat', 'shat', 'MLR'])
                 batch_counter = 0
                 for i in range(repN):
-                    countfile = f'{ABSL_PATH}200kb_HC_{cond}_ConstN_t9x500gen/count/HC_{cond}_ConstN_t9x500gen_n40_rep{i}.count'
+                    countfile = f'{wdir}200kb_HC_{cond}_ConstN_t9x500gen/count/HC_{cond}_ConstN_t9x500gen_n40_rep{i}.count'
                     # `masks` be a list of strings representing different masks
                     # return: sel_pos, max-MLR pos, list of pos (to keep)
                     try:
-                        pos_list, sel_pos = read_slim_counts_and_filter(countfile, masks=[" "], minMAF=poolMAF)  # 2morePoly
+                        pos_list, sel_pos = read_slim_counts_and_filter(countfile, masks=[" "],
+                                                                        minMAF=poolMAF)  # 2morePoly
                     except FileNotFoundError:  # {countfile}
                         print(f'{cond} rep {i} sample count file doesn\'t exist! Skip.')
                         # continue
@@ -290,15 +274,15 @@ def main():
 
                     if f's{s}_h{h}' in ['s.0_h0', 's.0_h1', 's.0_h5']:
                         # sanity check
-                        assert cond == f's.0_h.5{sv_insert}', cond
-                        mlrfilename = f'{ABSL_PATH}200kb_HC_{cond}_ConstN_t9x500gen/likelihood/HC_{cond}_ConstN_t9x500gen_n40_rep{i}_DL_MAF{str(poolMAF)[1:]}_fixH{h}_51xgeom75e-2_{llInit}_off-grid_maxLLs.txt'
+                        assert cond == f's.0_h.5', cond
+                        mlrfilename = f'{wdir}200kb_HC_{cond}_ConstN_t9x500gen/likelihood/HC_{cond}_ConstN_t9x500gen_n40_rep{i}_DL_MAF{str(poolMAF)[1:]}_fixH{h}_51xgeom75e-2_{llInit}_off-grid_maxLLs.txt'
                     else:
-                        mlrfilename = f'{ABSL_PATH}200kb_HC_{cond}_ConstN_t9x500gen/likelihood/HC_{cond}_ConstN_t9x500gen_n40_rep{i}_DL_MAF{str(poolMAF)[1:]}_51xgeom75e-2_{llInit}_off-grid_maxLLs.txt'
+                        mlrfilename = f'{wdir}200kb_HC_{cond}_ConstN_t9x500gen/likelihood/HC_{cond}_ConstN_t9x500gen_n40_rep{i}_DL_MAF{str(poolMAF)[1:]}_51xgeom75e-2_{llInit}_off-grid_maxLLs.txt'
 
                     if not os.path.exists(mlrfilename):
                         # HC_s.0_h.5_newSV_ConstN_t9x500gen_n40_rep195_DL_MAF.05_fixH1_51xgeom75e-2_Unif_off-grid_maxLLs.txt
                         # HC_s.0_h.5_newSV_ConstN_t9x500gen_n40_rep150_DL_MAF.05_51xgeom75e-2_Unif_off-grid_maxLLs.txt
-                        # mlrfilename = f'{ABSL_PATH}200kb_HC_{cond}_ConstN_t9x500gen/likelihood/HC_{cond}_ConstN_t9x500gen_n40_rep{i}_DL_51xgeom75e-2_{llInit}_off-grid_maxLLs.txt'.split("/")[-1]
+                        # mlrfilename = f'{wdir}200kb_HC_{cond}_ConstN_t9x500gen/likelihood/HC_{cond}_ConstN_t9x500gen_n40_rep{i}_DL_51xgeom75e-2_{llInit}_off-grid_maxLLs.txt'.split("/")[-1]
                         print(f'{cond} rep {i} maxLL file doesn\'t exist! Skip.\n\t{mlrfilename}')
                         # continue
                         sys.exit()
@@ -313,10 +297,8 @@ def main():
                         continue
 
                     # add to existing DF
-                    # if SelPos_pdRow is not None:
                     if sel_target_exist:
                         assert SelPos_pdRow is not None
-                        # batch_Selected_sites.loc[batch_counter] = pd.DataFrame({'rep': i,
                         temp_new_row = {'rep': i, 'position': SelPos_pdRow[0],
                                         'ongrid_shat': SelPos_pdRow[1],
                                         'shat': SelPos_pdRow[2], 'MLR': SelPos_pdRow[3]}
@@ -346,11 +328,12 @@ def main():
                 Selected_sites = pd.concat([Selected_sites, batch_Selected_sites], ignore_index=True)
                 maxMLR_sites = pd.concat([maxMLR_sites, batch_maxMLR_sites], ignore_index=True)
                 # sanity check
-                assert maxMLR_sites.shape[
-                           0] == counter, f'maxMLR_sites.shape[0]={maxMLR_sites.shape[0]}\ncounter={counter}'
+                assert maxMLR_sites.shape[0] == counter, \
+                    f'maxMLR_sites.shape[0]={maxMLR_sites.shape[0]}\ncounter={counter}'
                 print("Done with ", cond, 'LL_H =', h, time.ctime())
         # End of looping through all s & h, save to file
-        Selected_sites = Selected_sites.reindex(columns=['Condition', 's2', 'h', 'rep', 'position', 'ongrid_shat', 'shat', 'MLR'])
+        Selected_sites = Selected_sites.reindex(
+            columns=['Condition', 's2', 'h', 'rep', 'position', 'ongrid_shat', 'shat', 'MLR'])
         Selected_sites.to_csv(meta_selFile, sep="\t", index=False)
         maxMLR_sites.reindex(columns=['Condition', 's2', 'h', 'rep', 'position', 'ongrid_shat', 'shat', 'MLR']).to_csv(
             meta_maxFile, sep="\t", index=False)
@@ -366,9 +349,10 @@ def main():
                                                 'position': np.int64, 'ongrid_shat': np.float64, 'shat': np.float64,
                                                 'MLR': np.float64})
         if not isinstance(maxMLR_sites.position[0], int):
-            maxMLR_sites = pd.read_csv(meta_maxFile, sep="\t", dtype={'Condition': str, 's2': float, 'h': float, 'rep': int,
-                                                                 'position': np.int64, 'ongrid_shat': np.float64,
-                                                                 'shat': np.float64, 'MLR': np.float64})
+            maxMLR_sites = pd.read_csv(meta_maxFile, sep="\t",
+                                       dtype={'Condition': str, 's2': float, 'h': float, 'rep': int,
+                                              'position': np.int64, 'ongrid_shat': np.float64,
+                                              'shat': np.float64, 'MLR': np.float64})
     print(Selected_sites.describe())
     print(maxMLR_sites.describe())
 

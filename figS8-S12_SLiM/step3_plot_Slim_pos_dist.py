@@ -5,8 +5,7 @@ import warnings
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 warnings.filterwarnings("ignore", category=UserWarning)
 
-import sys, time, os, re, pickle
-import numpy as np
+import sys, os
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -69,41 +68,10 @@ def _express_H(H):
         return f'h = {float(H):g}, {Dom[H]}'
 
 
-def plot_dist_violins(merged_scores, fig_prefix, H_colors, var_labels, fig_title, sv_insert):
-    # now we plot
-    vfig, vp = plt.subplots(figsize=(7, 3.5), sharey=True)  # ncols=2, nrow=1,
-
-    sns.set_theme(style='whitegrid')  # , rc=Theme_params
-    # _H_colors_with_alpha(alpha=0.5) hue_order=[0.5, 0, 1], hue_order=[0.5, 0, 1]
-    vp = sns.violinplot(data=merged_scores, x='true_s', y='dist', hue='H',
-                        linewidth=0.5, inner="box", palette=H_colors,
-                        fliersize=0.3, orient="v", scale="area", ax=vp)
-    # plt.setp(vp.collections, alpha=0.5)
-    vp.grid(visible=True, axis='x', lw=0.3)
-    vp.axhline(0, xmin=0, xmax=1, lw=0.8)
-    # axes and legend
-    vp.set_ylabel('Distance to Target (bp)', fontsize="small")
-    vp.set_xlabel(f'{var_labels[0]} ( or t{var_labels[1][1:]} for h=5)', fontsize="small")
-    vp.tick_params(axis='both', labelsize="x-small")
-    handles, labels = vp.get_legend_handles_labels()
-    # print(handles, labels)
-    labels = [_express_H(h) for h in labels]
-    lg = vp.legend(handles, labels, loc="best", title='', ncol=2,  # "lower right"
-                   # loc="best", bbox_to_anchor=(0.5, 0), borderaxespad=6,
-                   edgecolor='None', facecolor='None', markerscale=1,
-                   fontsize="xx-small", title_fontsize="x-small", frameon=False)
-    for t in lg.get_texts():
-        t.set_va('center')  # baseline_'bottom'
-    vp.set_title(fig_title, fontsize='medium')
-    figname = f'{fig_prefix}_Dist_200kb_t9x500gen_n40{sv_insert}_varS1+varS2_Unif_offGrid-maxLLR_violins.png'
-    print(figname)
-    vfig.savefig(figname, dpi=500, transparent=True)
-
-
-def plot_dist_boxplots(merged_scores, fig_prefix, H_colors, var_labels, fig_title, sv_insert,
+def plot_dist_boxplots(merged_scores, fig_prefix, H_colors, var_labels, fig_title,
                        add_dots=False, point_colors=None):
     # now we plot
-    fig, bp = plt.subplots(figsize=(7, 3.5), sharey=True)  # ncols=2, nrow=1,
+    fig, bp = plt.subplots(figsize=(7, 3.5), sharey=True)
 
     # set up frame
     sns.set_theme(style='whitegrid')  # , rc=Theme_params
@@ -139,20 +107,20 @@ def plot_dist_boxplots(merged_scores, fig_prefix, H_colors, var_labels, fig_titl
         t.set_va('center')  # baseline_'bottom'
     bp.set_title(fig_title, fontsize='small')
     fig.tight_layout()
-    figname = f'{fig_prefix}_Dist_200kb_t9x500gen_n40{sv_insert}_varS1+varS2_Unif_offGrid-maxLLR_boxplots.png'
+    figname = f'{fig_prefix}_Dist_200kb_t9x500gen_n40_varS1+varS2_Unif_offGrid-maxLLR_boxplots.png'
     fig.savefig(figname, dpi=500, transparent=True)
     print(figname)
 
 
 def main():
     fig_prefix = sys.argv[1]
-    sv_insert = '_newSV'
-    vars2_slist = ['.0', '.001', '.002', '.003', '.004', '.005']  # , '.01', '.02', '.05'
-    vars1_slist = ['.0', '.0002', '.0004', '.0006', '.0008', '.001']  # , '.01', '.02', '.05'
-    sel_scoreFile_s2 = 'DL-varS2_selected-sites_NotLost_minMAF.05_200kb_t9x500gen_n40_newSV_3h6s_Concatenated_offGrid_Dist.tsv.gz'
-    max_scoreFile_s2 = 'DL-varS2_maxLR-sites_NotLost_minMAF.05_200kb_t9x500gen_n40_newSV_3h6s_Concatenated_offGrid_Dist.tsv.gz'
-    sel_scoreFile_s1 = 'DL-varS1_selected-sites_NotLost_minMAF.05_200kb_t9x500gen_n40_newSV_2h6s_Concatenated_offGrid_Dist.tsv.gz'
-    max_scoreFile_s1 = 'DL-varS1_maxLR-sites_NotLost_minMAF.05_200kb_t9x500gen_n40_newSV_2h6s_Concatenated_offGrid_Dist.tsv.gz'
+    vars2_slist = ['.0', '.001', '.002', '.003', '.004', '.005']
+    vars1_slist = ['.0', '.0002', '.0004', '.0006', '.0008', '.001']
+    # sel_scoreFile_s2 = 'DL-varS2_selected-sites_NotLost_minMAF.05_200kb_t9x500gen_n40_3h6s_Concatenated_offGrid_Dist.tsv.gz'
+    # max_scoreFile_s2 = 'DL-varS2_maxLR-sites_NotLost_minMAF.05_200kb_t9x500gen_n40_3h6s_Concatenated_offGrid_Dist.tsv.gz'
+    # sel_scoreFile_s1 = 'DL-varS1_selected-sites_NotLost_minMAF.05_200kb_t9x500gen_n40_2h6s_Concatenated_offGrid_Dist.tsv.gz'
+    # max_scoreFile_s1 = 'DL-varS1_maxLR-sites_NotLost_minMAF.05_200kb_t9x500gen_n40_2h6s_Concatenated_offGrid_Dist.tsv.gz'
+    sel_scoreFile_s2, max_scoreFile_s2, sel_scoreFile_s1, max_scoreFile_s1 = sys.argv[2:]
 
     # some plotting parameters
     H_2plot = [['0.0', '0.5', '1.0'], ['5.0']]
@@ -181,9 +149,9 @@ def main():
 
     var_labels = [r"True $s_{AA}$", r"True $s_{Aa}$"]
 
-    vars2_Cond_list = [f's{s}_h{h}{sv_insert}' for s in vars2_slist
+    vars2_Cond_list = [f's{s}_h{h}' for s in vars2_slist
                        for h in ['.5', '0', '1'] if f's{s}_h{h}' not in ['s.0_h0', 's.0_h1']]
-    vars1_Cond_list = [f's{s}_h5{sv_insert}' for s in vars1_slist] + [f's.0_h.5{sv_insert}']
+    vars1_Cond_list = [f's{s}_h5' for s in vars1_slist] + [f's.0_h.5']
 
     # read var_s2
     merged_scores_s2 = read_scores(sel_scoreFile_s2, max_scoreFile_s2, 's2', H_2plot[0], vars2_Cond_list)
@@ -194,8 +162,6 @@ def main():
     # now merge s1 & s2
     merged_scores = merged_scores_s2.merge(merged_scores_s1, suffixes=['_varS2', '_varS1'], how='outer',
                                            on=['true_s', 'h', 'rep', 'position_true', 'position_maxLR']
-                                           # left_on=['s2', 'true_s', 'h', 'rep', 'position_true', 'position_maxLR', 'shat_true', 'shat_maxLR'],
-                                           # right_on=['s1', 'true_s', 'h', 'rep', 'position_true', 'position_maxLR', 'shat_true', 'shat_maxLR'],
                                            )
     # get distance
     merged_scores['dist'] = merged_scores.position_maxLR.astype(int) - merged_scores.position_true.astype(int)
@@ -206,11 +172,8 @@ def main():
 
     # now plot
     fig_title = 'Distance of highest LLR site from selection target'
-    if 'box' in sys.argv:
-        plot_dist_boxplots(merged_scores, fig_prefix, H_colors, var_labels, fig_title, sv_insert,
-                           add_dots=True, point_colors=dot_colors)
-    elif 'violin' in sys.argv:
-        plot_dist_violins(merged_scores, fig_prefix, H_colors, var_labels, fig_title, sv_insert)
+    plot_dist_boxplots(merged_scores, fig_prefix, H_colors, var_labels, fig_title,
+                       add_dots=True, point_colors=dot_colors)
 
 
 if __name__ == '__main__':

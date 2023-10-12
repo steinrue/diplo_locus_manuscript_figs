@@ -26,7 +26,7 @@ import numpy as np
 import pandas as pd
 import pandas.api.types as ptypes
 # local import
-from diplo_locus.utility import parse_vcf_input, parse_ind_file, parse_ind_arg
+from diplo_locus.utility import parse_vcf_input, parse_ind_arg
 # regex preps
 import re
 
