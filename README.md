@@ -3,6 +3,10 @@
 
 This repository contains replicable scripts for generating simulations and replicating figures as shown in the manuscript.
 
+To cite our application, use the reference:
+
+>   Cheng, X. and Steinruecken, M. (2023) diplo-locus: A lightweight toolkit for inference and simulation of time-series genetic data under general diploid selection. bioarxiv: https://doi.org/10.1101/2023.10.12.562101
+
 ------------------
 ## Set up
 
