@@ -20,7 +20,7 @@ Download this repository with
 ```shell
 # download
 git clone https://github.com/steinrue/diplo_locus_manuscript_figs
-# enter the diricatory
+# enter the directory
 cd diplo_locus_manuscript_figs
 ```
 
