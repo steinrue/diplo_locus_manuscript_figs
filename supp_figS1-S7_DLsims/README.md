@@ -9,7 +9,7 @@
 Navigate to the corresponding subdirectory and create a folder to keep all the simulated data:
 ```shell
 # navigate to the directory
-cd supp_figS17-S19_dsim/
+cd supp_figS1-S7_DLsims/
 # create folder for simulated data
 mkdir simulations/
 ```

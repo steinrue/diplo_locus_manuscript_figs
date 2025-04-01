@@ -2,7 +2,81 @@ import numpy as np
 import pandas as pd
 import pickle, sys
 import seaborn as sns
+import pathlib
 import matplotlib.pyplot as plt
+import bz2
+
+
+
+
+MY_PALETTE = [plt.cm.tab10(0), plt.cm.tab10(2)]
+ONSET_RESULTS_PICKLE_FILE = pathlib.Path ("../supp_figS8_onset/final_lls.pickle.bz2")
+
+
+
+
+def loadPickledResults (pickleFile):
+
+    # unpickle
+    pickleData = pickle.load (bz2.open (pickleFile, "rb"))
+    numSimReps = pickleData['numSimReps']
+    constMLEs = pickleData['constMLEs']
+    onsetMLEs = pickleData['onsetMLEs']
+
+    # then build a dataframes for seaborn
+    mles = {
+        'onset' : onsetMLEs,
+        'constant' : constMLEs,
+    }
+    frames = {}
+    for (thisSimScenario, thisMLEs) in mles.items():
+        thisColumns = ['onsetScenario', 'trueS2', 'rep', 's2Hat']
+        if (thisSimScenario == 'onset'):
+            thisColumns.append ('tHat')
+        thisFrame = None
+        # fill it
+        for (k,v) in thisMLEs.items():
+            (thisScenario, thisS2String) = k
+            thisDict = {
+                'onsetScenario' : np.repeat (thisScenario, numSimReps),
+                'trueS2' : np.repeat (float(thisS2String), numSimReps),
+                'rep' : np.arange (numSimReps),
+                'baseLL' : v[:,0],
+                'maxLL' : v[:,1],
+                's2Hat' : v[:,2],
+            }
+            if (thisSimScenario == 'onset'):
+                thisDict['tHat'] = v[:,3]
+
+            # and extend the big frame
+            thisDF = pd.DataFrame (thisDict)
+            if (thisFrame is None):
+                thisFrame = thisDF
+            else:
+                thisFrame = pd.concat([thisFrame, thisDF], axis=0)
+        
+        # store the new frame
+        frames[thisSimScenario] = thisFrame
+
+    # then put the frame with the onset results together
+    preFrame = frames['onset']
+    onsetFrame = preFrame[preFrame['onsetScenario'] == 'onset']
+
+    return onsetFrame
+
+
+def boxplotOnset (ax, onsetFrame):
+    ax = sns.boxplot(data=onsetFrame, x="trueS2", y="tHat", fliersize=0.5, orient="v", ax=ax)
+
+    ax.grid(visible=True, axis='y', lw=0.3)
+    # add aux lines
+    trueT = 2000
+    ax.axline ((0,trueT), slope=0, color='C3', linestyle='dashed', lw=1)
+    ax.tick_params(axis='both', labelsize="small")
+    ax.set_xlabel(r'True $s_{AA}$', fontsize="small")
+    ax.set_ylabel(r'Inferred $\hat{t}_{o}$', fontsize="small")
+
+    return ax
 
 
 def get_ROCs(neut_data, sel_data):
@@ -84,14 +158,15 @@ def plot_MLEs(ax, metaS2hats, H_2plot, true_s_2plot):
     meltedDF_shat = meltedDF_shat[meltedDF_shat.s2hat > -8]
     print('After removing boundary & anomaly hits, shape = ', meltedDF_shat.shape)
     # get the subset of good sampling schemes
-    DF_subset = meltedDF_shat[meltedDF_shat.H.isin([H_2plot]) &
+    # DF_subset = meltedDF_shat[meltedDF_shat.H.isin([H_2plot]) &
+    DF_subset = meltedDF_shat[meltedDF_shat.H.isin(H_2plot) &
                               meltedDF_shat.true_s2.astype(str).isin(true_s_2plot)].copy()
     # turn true_s2 to numeric
     DF_subset['true_s2'] = pd.to_numeric(DF_subset.loc[:, 'true_s2'])
     # print(DF_subset.iloc[:10,:]), errors='coerce'
 
     ax = sns.boxplot(data=DF_subset, x="true_s2", y="s2hat", hue="H",
-                     fliersize=0.5, orient="v", ax=ax)
+                     fliersize=0.5, orient="v", ax=ax, palette=MY_PALETTE)
     ax.grid(visible=True, axis='y', lw=0.3)
     ax.hlines(y=list(map(float, true_s_2plot)), xmin=-0.5, xmax=len(true_s_2plot) - 0.4,
               colors=['black'] * len(true_s_2plot), linestyle='dashed', lw=0.5)
@@ -138,29 +213,38 @@ def main():
             (LRs_varS2[H], s2Hat_varS2[H], LLs_varS2[H]) = pickle.load(pk)
         pk.close()
 
+    # we also need the onsetFrame
+    onsetFrame = loadPickledResults (ONSET_RESULTS_PICKLE_FILE)
+
     # panel A: ROC h=0.5
     ax['A'] = plot_ROCs(ax['A'], LRs_varS2, H="0.5", true_s2s=true_s_2plot)
-    ax['A'].set_title('A)', loc='left', fontsize="medium", fontweight='bold')
+    ax['A'].set_title('a', loc='left', fontsize="medium", fontweight='bold')
     ax['A'].legend(loc="best",  # 'center left', ncol=2, bbox_to_anchor=(1, 0.5),
                    edgecolor='None', facecolor='None',
                    fontsize="xx-small", title_fontsize="x-small", frameon=False, title="True $s_{AA}$")
 
     # panel B: boxplots h=0.5
-    ax['B'] = plot_MLEs(ax['B'], s2Hat_varS2, "0.5", true_s_2plot)
+    # ax['B'] = plot_MLEs(ax['B'], s2Hat_varS2, "0.5", true_s_2plot)
+    ax['B'] = plot_MLEs(ax['B'], s2Hat_varS2, ["0.5", "1.0"], true_s_2plot)
     ax['B'].tick_params(labelsize=8)
-    ax['B'].set_title('B)', loc='left', fontsize="medium", fontweight='bold')  # , fontstyle='bold'
+    ax['B'].set_title('b', loc='left', fontsize="medium", fontweight='bold')  # , fontstyle='bold'
+    ax['B'].legend(["h=0.5", "h=1"], loc="best", edgecolor='None', facecolor='None',
+                   fontsize="xx-small", title_fontsize="x-small", frameon=False)
+    leg = ax['B'].get_legend()
+    leg.legend_handles[0].set_facecolor (MY_PALETTE[0])
+    leg.legend_handles[1].set_facecolor (MY_PALETTE[1])
 
-    # panel A: ROC h=1.0
+    # panel C: ROC h=1.0
     ax['C'] = plot_ROCs(ax['C'], LRs_varS2, H="1.0", true_s2s=true_s_2plot)
-    ax['C'].set_title('C)', loc='left', fontsize="medium", fontweight='bold')
+    ax['C'].set_title('c', loc='left', fontsize="medium", fontweight='bold')
     ax['C'].legend(loc="best",  # 'center left', ncol=2, bbox_to_anchor=(1, 0.5),
                    edgecolor='None', facecolor='None',
                    fontsize="xx-small", title_fontsize="x-small", frameon=False, title="True $s_{AA}$")
 
-    # panel B: boxplots h=1.0
-    ax['D'] = plot_MLEs(ax['D'], s2Hat_varS2, "1.0", true_s_2plot)
+    # # panel D: boxplots onset
+    ax['D'] = boxplotOnset (ax['D'], onsetFrame)
     ax['D'].tick_params(labelsize=8)
-    ax['D'].set_title('D)', loc='left', fontsize="medium", fontweight='bold')  # , fontstyle='bold'
+    ax['D'].set_title('d', loc='left', fontsize="medium", fontweight='bold')  # , fontstyle='bold'
 
     plt.subplots_adjust(left=0.1,
                         bottom=0.1, 

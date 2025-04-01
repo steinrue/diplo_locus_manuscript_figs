@@ -1,8 +1,8 @@
-## Fig. S13 - S14: Benchmarking `DiploLocus`
+## Figure S14 - S15: Benchmarking `DiploLocus`
 
 The following scripts can be used to benchmark the methods __diplo-locus__, __LLS__, __WFABC__, and __bmws__ on simulated data. The results are given in Table 1 in the main text and Figure S13 and S14 in the supplemental material.
 
-To run the scripts, change into the sub-directory `supp_figS13-S14_comparison/`. Make that sure all required executables are available:
+To run the scripts, change into the sub-directory `supp_figS14-S15_comparison/`. Make that sure all required executables are available:
 
 - Install __diplo-locus__: Confirm that `DiploLocus-likelihood` and `DiploLocus-simulate` can be called from the command line after running:
 ```
@@ -11,7 +11,7 @@ pip install "git+https://github.com/steinrue/diplo_locus@v1.2.0"
 
 - Install __LLS__: Confirm that the executable `Rscript` is available on the command line and follow the installation instructions at https://github.com/ThomasTaus/poolSeq.
 
-- Install __WFABC__: Download `WFABC v1.1` from http://jjensenlab.org/software (http://jjensenlab.org/wp-content/uploads/2016/02/WFABC_v1.1.zip). Extract the archive and ensure that the binaries `./WFABC_v1.1/binaries/Linux/wfabc_1` and `./WFABC_v1.1/binaries/Linux/wfabc_2` are available to execute (using these exact commands) from within the `supp_figS13-S14_comparison/` directory. 
+- Install __WFABC__: Download `WFABC v1.1` from http://jjensenlab.org/software (http://jjensenlab.org/wp-content/uploads/2016/02/WFABC_v1.1.zip). Extract the archive and ensure that the binaries `./WFABC_v1.1/binaries/Linux/wfabc_1` and `./WFABC_v1.1/binaries/Linux/wfabc_2` are available to execute (using these exact commands) from within the `supp_figS14-S15_comparison/` directory. 
 
 - Install __bmws__: To install __bmws__, as detailed at https://github.com/jthlab/bmws, (commit `ef2fc2e`) and make the command `bmws` available on the command line, run
 ```
@@ -101,7 +101,7 @@ Once all jobs finished, run
 ```
 python step6_collect_results.py
 ```
-to collect the results of the analysis. The script generates the files `box_g160.pdf` and `box_g4000.pdf`, which are Figure S13 and S14 in the supplemental material, respectively. It also generates the file `time_table.tex`, which is used to generate Table 1 in the main text.
+to collect the results of the analysis. The script generates the files `box_g160.pdf` and `box_g4000.pdf`, which are Figure S14 and S15 in the supplemental material, respectively. It also generates the file `time_table.tex`, which is used to generate Table 1 in the main text.
 
 These are the boxplots generated.
 

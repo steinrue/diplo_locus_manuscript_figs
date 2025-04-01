@@ -1,4 +1,4 @@
-## Fig. S17 - S19: Analyzing Evolve & Resequence data for Drosophila simulans
+## Figure S19 - S21: Analyzing Evolve & Resequence data for Drosophila simulans
 
 The scripts in this folder are used to analyze the temporal data from Barghi et al. (2019) [https://doi.org/10.1371/journal.pbio.3000128] using __diplo-locus__. This data is collected from an Evolve & Resequence experiment where 10 replicates of Drosophila simulans populations where esposed to a new temperature regime, and temporal samples where taken over the course of the experiment. The scripts analyze the temporal genotype data from chromosome `2L`, and the results are shown in Figure S17 in the supplemental material and Figure 2 in the main text.
 
@@ -12,7 +12,7 @@ In addition to __diplo-locus__ and its required packages, the scripts presented 
 First, navigate to the sub-directory for this analysis and create a new folder for the data by running
 ```shell
 # navigate to sub-directory
-cd supp_figS17-S19_dsim/
+cd supp_figS19-S21_dsim/
 # create directory for data
 mkdir data
 # navigate to data directory
@@ -77,20 +77,20 @@ To collect the results and produce the manhattan plot of $p$-values combined acr
 python collect_results.py
 python plot_manhattan.py
 ```
-This generates the file `dsim_manhattan_fisher.pdf` which is shown below and is Figure S17 in the supplemental material. The data collected in this step is also used to produce Figure 2 in the main text.
+This generates the file `dsim_manhattan_fisher.pdf` which is shown below and is Figure S19 in the supplemental material. The data collected in this step is also used to produce Figure 2 in the main text.
 
 ![manhatten_fisher](dsim_manhattan_fisher.png)
 
 
 ### Identifying genes in significant regions
 
-The sequencing data from Barghi et al. (2019) [https://doi.org/10.1371/journal.pbio.3000128] is aligned using the pipeline from Barghi et al. (2017) [https://doi.org/10.1534/g3.117.043349] against the genome assembly M252 described by Palmieri et al. (2015) [https://doi.org/10.1111/1755-0998.12297]. The corresponding genome annotation can be obtained from __DRYAD__ at https://www.doi.org/10.5061/dryad.ng95t. The direct link https://datadryad.org/stash/downloads/file_stream/100473 can be used to directly download the file `dsim-M252-popgen-ann-r1.1.gtf` that contains the annotations.
+The sequencing data from Barghi et al. (2019) [https://doi.org/10.1371/journal.pbio.3000128] is aligned using the pipeline from Barghi et al. (2017) [https://doi.org/10.1534/g3.117.043349] against the genome assembly M252 described by Palmieri et al. (2015) [https://doi.org/10.1111/1755-0998.12297]. The corresponding genome annotation can be obtained from __DRYAD__ at https://www.doi.org/10.5061/dryad.ng95t. The direct link https://datadryad.org/stash/downloads/file_stream/100473 can be used to directly download the file `dsim-M252-popgen-ann-r1.1.gtf` that contains the annotations. We furthermore obtained corresponding gene names for the Flybase ID's using the database at `https://www.alliancegenome.org/`, and the relevant names are stored in the file `flybase_gene_names.txt`.
 
-Once you downloaded this file, you can run:
+Once all files are in place, run:
 ```shell
 python plot_peaks.py
 ```
-to generate the plots `dsim_peak1.pdf` and `dsim_peak2.pdf` that show the p-values around the two strong peaks (Figure S18 and S19 in the supplemtal material, respectively). The script also prints the FlyBase ids of the genes within 10 kb of both significant regions.
+to generate the plots `dsim_peak1.pdf` and `dsim_peak2.pdf` that show the p-values around the two strong peaks (Figure S20 and S21 in the supplemtal material, respectively). The script also prints the FlyBase ids of the genes within 10 kb of both significant regions.
 
 ![dsim_peak1](dsim_peak1.png)
 

@@ -178,88 +178,109 @@ cython_debug/
 /supp_figS1-S7_DLsims/simInitSV_s2-87235_s1-9567_LLinitUnif_MLE_outliers.tsv
 
 
-/supp_figS8-S12_SLiM/200kb_HC_s.0002_h5_ConstN_t9x500gen/
-/supp_figS8-S12_SLiM/200kb_HC_s.0004_h5_ConstN_t9x500gen/
-/supp_figS8-S12_SLiM/200kb_HC_s.0006_h5_ConstN_t9x500gen/
-/supp_figS8-S12_SLiM/200kb_HC_s.0008_h5_ConstN_t9x500gen/
-/supp_figS8-S12_SLiM/200kb_HC_s.001_h.5_ConstN_t9x500gen/
-/supp_figS8-S12_SLiM/200kb_HC_s.001_h0_ConstN_t9x500gen/
-/supp_figS8-S12_SLiM/200kb_HC_s.001_h1_ConstN_t9x500gen/
-/supp_figS8-S12_SLiM/200kb_HC_s.001_h5_ConstN_t9x500gen/
-/supp_figS8-S12_SLiM/200kb_HC_s.002_h.5_ConstN_t9x500gen/
-/supp_figS8-S12_SLiM/200kb_HC_s.002_h0_ConstN_t9x500gen/
-/supp_figS8-S12_SLiM/200kb_HC_s.002_h1_ConstN_t9x500gen/
-/supp_figS8-S12_SLiM/200kb_HC_s.003_h.5_ConstN_t9x500gen/
-/supp_figS8-S12_SLiM/200kb_HC_s.003_h0_ConstN_t9x500gen/
-/supp_figS8-S12_SLiM/200kb_HC_s.003_h1_ConstN_t9x500gen/
-/supp_figS8-S12_SLiM/200kb_HC_s.004_h.5_ConstN_t9x500gen/
-/supp_figS8-S12_SLiM/200kb_HC_s.004_h0_ConstN_t9x500gen/
-/supp_figS8-S12_SLiM/200kb_HC_s.004_h1_ConstN_t9x500gen/
-/supp_figS8-S12_SLiM/200kb_HC_s.005_h.5_ConstN_t9x500gen/
-/supp_figS8-S12_SLiM/200kb_HC_s.005_h0_ConstN_t9x500gen/
-/supp_figS8-S12_SLiM/200kb_HC_s.005_h1_ConstN_t9x500gen/
-/supp_figS8-S12_SLiM/200kb_HC_s.0_h.5_ConstN_t9x500gen/
-/supp_figS8-S12_SLiM/200kb_HC_s.0_h0_ConstN_t9x500gen/
-/supp_figS8-S12_SLiM/200kb_HC_s.0_h1_ConstN_t9x500gen/
-/supp_figS8-S12_SLiM/200kb_HC_s.0_h5_ConstN_t9x500gen/
+/supp_figS8_onset/simulated_data/
+/supp_figS8_onset/SLURM_SIMULATE.txt
+/supp_figS8_onset/submit_sim_onset.sh
+/supp_figS8_onset/slurmify_sim_onset/
 
-/supp_figS8-S12_SLiM/DL-varS1_maxLR-sites_minMAF.05_200kb_t9x500gen_n40_1h6s_Concatenated_offGrid_Dist.tsv.gz
-/supp_figS8-S12_SLiM/DL-varS1_selected-sites_minMAF.05_200kb_t9x500gen_n40_1h6s_Concatenated_offGrid_Dist.tsv.gz
-/supp_figS8-S12_SLiM/DL-varS2_maxLR-sites_minMAF.05_200kb_t9x500gen_n40_3h6s_Concatenated_offGrid_Dist.tsv.gz
-/supp_figS8-S12_SLiM/DL-varS2_selected-sites_minMAF.05_200kb_t9x500gen_n40_3h6s_Concatenated_offGrid_Dist.tsv.gz
+/supp_figS8_onset/results_diplo_locus/
+/supp_figS8_onset/SLURM_ANALYZE.txt
+/supp_figS8_onset/submit_analysis_onset.sh
+/supp_figS8_onset/slurmify_analysis_onset/
 
-/supp_figS8-S12_SLiM/SLiM_Dist_200kb_t9x500gen_n40_varS1+varS2_Unif_offGrid-maxLLR_boxplots.pdf
-/supp_figS8-S12_SLiM/maxLR-sites_200kb_t9x500gen_n40_off-Grid_ROCs.pdf
-/supp_figS8-S12_SLiM/maxLR-sites_200kb_t9x500gen_n40_offGrid_MLEs_contrastBoxes.pdf
-/supp_figS8-S12_SLiM/target-sites_200kb_t9x500gen_n40_off-Grid_ROCs.pdf
-/supp_figS8-S12_SLiM/target-sites_200kb_t9x500gen_n40_offGrid_MLEs_contrastBoxes.pdf
-
-/supp_figS8-S12_SLiM/tmp/
+/supp_figS8_onset/final_lls.pickle.bz2
+/supp_figS8_onset/QQ_ROC_BOX_onset.pdf
 
 
-/supp_figS13-S14_comparison/WFABC_v1.1/
+/supp_figS9-S13_SLiM/200kb_HC_s.0002_h5_ConstN_t9x500gen/
+/supp_figS9-S13_SLiM/200kb_HC_s.0004_h5_ConstN_t9x500gen/
+/supp_figS9-S13_SLiM/200kb_HC_s.0006_h5_ConstN_t9x500gen/
+/supp_figS9-S13_SLiM/200kb_HC_s.0008_h5_ConstN_t9x500gen/
+/supp_figS9-S13_SLiM/200kb_HC_s.001_h.5_ConstN_t9x500gen/
+/supp_figS9-S13_SLiM/200kb_HC_s.001_h0_ConstN_t9x500gen/
+/supp_figS9-S13_SLiM/200kb_HC_s.001_h1_ConstN_t9x500gen/
+/supp_figS9-S13_SLiM/200kb_HC_s.001_h5_ConstN_t9x500gen/
+/supp_figS9-S13_SLiM/200kb_HC_s.002_h.5_ConstN_t9x500gen/
+/supp_figS9-S13_SLiM/200kb_HC_s.002_h0_ConstN_t9x500gen/
+/supp_figS9-S13_SLiM/200kb_HC_s.002_h1_ConstN_t9x500gen/
+/supp_figS9-S13_SLiM/200kb_HC_s.003_h.5_ConstN_t9x500gen/
+/supp_figS9-S13_SLiM/200kb_HC_s.003_h0_ConstN_t9x500gen/
+/supp_figS9-S13_SLiM/200kb_HC_s.003_h1_ConstN_t9x500gen/
+/supp_figS9-S13_SLiM/200kb_HC_s.004_h.5_ConstN_t9x500gen/
+/supp_figS9-S13_SLiM/200kb_HC_s.004_h0_ConstN_t9x500gen/
+/supp_figS9-S13_SLiM/200kb_HC_s.004_h1_ConstN_t9x500gen/
+/supp_figS9-S13_SLiM/200kb_HC_s.005_h.5_ConstN_t9x500gen/
+/supp_figS9-S13_SLiM/200kb_HC_s.005_h0_ConstN_t9x500gen/
+/supp_figS9-S13_SLiM/200kb_HC_s.005_h1_ConstN_t9x500gen/
+/supp_figS9-S13_SLiM/200kb_HC_s.0_h.5_ConstN_t9x500gen/
+/supp_figS9-S13_SLiM/200kb_HC_s.0_h0_ConstN_t9x500gen/
+/supp_figS9-S13_SLiM/200kb_HC_s.0_h1_ConstN_t9x500gen/
+/supp_figS9-S13_SLiM/200kb_HC_s.0_h5_ConstN_t9x500gen/
 
-/supp_figS13-S14_comparison/SLURM_SIMULATE.txt
-/supp_figS13-S14_comparison/slurmify_simulate
-/supp_figS13-S14_comparison/submit_simulate.sh
+/supp_figS9-S13_SLiM/DL-varS1_maxLR-sites_minMAF.05_200kb_t9x500gen_n40_1h6s_Concatenated_offGrid_Dist.tsv.gz
+/supp_figS9-S13_SLiM/DL-varS1_selected-sites_minMAF.05_200kb_t9x500gen_n40_1h6s_Concatenated_offGrid_Dist.tsv.gz
+/supp_figS9-S13_SLiM/DL-varS2_maxLR-sites_minMAF.05_200kb_t9x500gen_n40_3h6s_Concatenated_offGrid_Dist.tsv.gz
+/supp_figS9-S13_SLiM/DL-varS2_selected-sites_minMAF.05_200kb_t9x500gen_n40_3h6s_Concatenated_offGrid_Dist.tsv.gz
 
-/supp_figS13-S14_comparison/simulated_data/
-/supp_figS13-S14_comparison/results_bmws/
-/supp_figS13-S14_comparison/results_diplo_locus/
-/supp_figS13-S14_comparison/results_lls/
-/supp_figS13-S14_comparison/results_wfabc/
+/supp_figS9-S13_SLiM/SLiM_Dist_200kb_t9x500gen_n40_varS1+varS2_Unif_offGrid-maxLLR_boxplots.pdf
+/supp_figS9-S13_SLiM/maxLR-sites_200kb_t9x500gen_n40_off-Grid_ROCs.pdf
+/supp_figS9-S13_SLiM/maxLR-sites_200kb_t9x500gen_n40_offGrid_MLEs_contrastBoxes.pdf
+/supp_figS9-S13_SLiM/target-sites_200kb_t9x500gen_n40_off-Grid_ROCs.pdf
+/supp_figS9-S13_SLiM/target-sites_200kb_t9x500gen_n40_offGrid_MLEs_contrastBoxes.pdf
 
-/supp_figS13-S14_comparison/submit_analyze.sh
-/supp_figS13-S14_comparison/SLURM_ANALYZE.txt
-/supp_figS13-S14_comparison/slurmify_analyze/
-
-/supp_figS13-S14_comparison/box_g160.pdf
-/supp_figS13-S14_comparison/box_g4000.pdf
+/supp_figS9-S13_SLiM/tmp/
 
 
-/supp_figS15-S16_LCT/aadr_v54.1_1240K/
-/supp_figS15-S16_LCT/extracted/
-/supp_figS15-S16_LCT/pval-wCutoff_2Mb_chr2_1356e5-1376e5_MAF.05_unif_fixH.5_51xgeom5e-1.pdf
-/supp_figS15-S16_LCT/pvals-wCutoff_chr2_MAF.05_unif_fixH.5_51xgeom5e-1.pdf
-/supp_figS15-S16_LCT/v54_chr2_UK_1240K_from4500_MAF.05_fixH.5_51x5e-1geomGrid_LLmatrices.table
-/supp_figS15-S16_LCT/v54_chr2_UK_1240K_from4500_MAF.05_fixH.5_51x5e-1geomGrid_off-grid_maxLLs.txt
+/supp_figS14-S15_comparison/WFABC_v1.1/
+
+/supp_figS14-S15_comparison/SLURM_SIMULATE.txt
+/supp_figS14-S15_comparison/slurmify_simulate
+/supp_figS14-S15_comparison/submit_simulate.sh
+
+/supp_figS14-S15_comparison/simulated_data/
+/supp_figS14-S15_comparison/results_bmws/
+/supp_figS14-S15_comparison/results_diplo_locus/
+/supp_figS14-S15_comparison/results_lls/
+/supp_figS14-S15_comparison/results_wfabc/
+
+/supp_figS14-S15_comparison/submit_analyze.sh
+/supp_figS14-S15_comparison/SLURM_ANALYZE.txt
+/supp_figS14-S15_comparison/slurmify_analyze/
+
+/supp_figS14-S15_comparison/box_g160.pdf
+/supp_figS14-S15_comparison/box_g4000.pdf
 
 
-/supp_figS17-S19_dsim/data/
+/supp_figS16_ASIP/ex1_ASIP_t13105_-init_51x51linGrid1e-1_LLmatrices.table
+/supp_figS16_ASIP/ex1_ASIP_t15000_-init_51x51linGrid1e-1_LLmatrices.table
+/supp_figS16_ASIP/ex1_ASIP_t17000_-init_51x51linGrid1e-1_LLmatrices.table
 
-/supp_figS17-S19_dsim/SLURM_ANALYZE_ALL.txt
-/supp_figS17-S19_dsim/submit_analyze_chr2L.sh
-/supp_figS17-S19_dsim/slurmify_analyze_chr2L/
-/supp_figS17-S19_dsim/results/
+/supp_figS16_ASIP/surfaces_ASIP_vt.pdf
 
-/supp_figS17-S19_dsim/runtimes.txt
 
-/supp_figS17-S19_dsim/dsim-M252-popgen-ann-r1.1.gtf
-/supp_figS17-S19_dsim/chr2L_processed_annotations.pickle.bz2
+/supp_figS17-S18_LCT/aadr_v54.1_1240K/
+/supp_figS17-S18_LCT/extracted/
+/supp_figS17-S18_LCT/pval-wCutoff_2Mb_chr2_1356e5-1376e5_MAF.05_unif_fixH.5_51xgeom5e-1.pdf
+/supp_figS17-S18_LCT/pvals-wCutoff_chr2_MAF.05_unif_fixH.5_51xgeom5e-1.pdf
+/supp_figS17-S18_LCT/v54_chr2_UK_1240K_from4500_MAF.05_fixH.5_51x5e-1geomGrid_LLmatrices.table
+/supp_figS17-S18_LCT/v54_chr2_UK_1240K_from4500_MAF.05_fixH.5_51x5e-1geomGrid_off-grid_maxLLs.txt
 
-/supp_figS17-S19_dsim/dsim_manhattan_fisher.pdf
-/supp_figS17-S19_dsim/dsim_peak1.pdf
-/supp_figS17-S19_dsim/dsim_peak2.pdf
+
+/supp_figS19-S21_dsim/data/
+
+/supp_figS19-S21_dsim/SLURM_ANALYZE_ALL.txt
+/supp_figS19-S21_dsim/submit_analyze_chr2L.sh
+/supp_figS19-S21_dsim/slurmify_analyze_chr2L/
+/supp_figS19-S21_dsim/results/
+
+/supp_figS19-S21_dsim/runtimes.txt
+
+/supp_figS19-S21_dsim/dsim-M252-popgen-ann-r1.1.gtf
+/supp_figS19-S21_dsim/chr2L_processed_annotations.pickle.bz2
+
+/supp_figS19-S21_dsim/dsim_manhattan_fisher.pdf
+/supp_figS19-S21_dsim/dsim_peak1.pdf
+/supp_figS19-S21_dsim/dsim_peak2.pdf
 
 
 /main_fig1/DL_main_fig1_ROC_MLE.pdf
@@ -267,6 +288,5 @@ cython_debug/
 
 /main_fig2/UK_v54.1_1240K_from4500_rs4988235_MAF.05_51x51linGrid2e-1_on-grid_maxLLs.txt
 /main_fig2/UK_v54.1_1240K_from4500_rs4988235_MAF.05_51x51linGrid2e-1_LLmatrices.table.gz
-/main_fig2/ex1_ASIP-init_51x51linGrid1e-1_LLmatrices.table
 
-/main_fig2/DL_main_fig2_dmel_lct_asip.pdf
+/main_fig2/DL_main_fig2_dsim_lct_asip.pdf

@@ -1,4 +1,4 @@
-## Fig. S8 - S12: `DiploLocus` likelihood-based inference on `SLiM` simulations
+## Fig. S9 - S13: `DiploLocus` likelihood-based inference on `SLiM` simulations
 
 - [2.1 Data generation on SLURM-managed HPC cluster](#Slim_sim)
 - [2.2 Data summary](#Slim_summary)
@@ -11,7 +11,7 @@ Before starting, the user must install [SLiM 4](https://messerlab.org/slim/), su
 To start from the root directory, navigate to the current directory:
 ```shell
 # navigate to the directory
-cd supp_figS8-S12_SLiM/
+cd supp_figS9-S13_SLiM/
 ```
 
 ### 2.1 Data generation on SLURM-managed HPC cluster
@@ -82,7 +82,7 @@ DL-varS1_maxLR-sites_minMAF.05_200kb_t9x500gen_n40_1h6s_Concatenated_offGrid_Dis
 ### 2.3 Plotting
 <a id="Slim_plot"> </a>
 
-The python scripts with prefix `step3_` are all used to generate plots based on the tables generated in the previous step. To generate the ROC curves (Fig. S8, Fig. S11), run:
+The python scripts with prefix `step3_` are all used to generate plots based on the tables generated in the previous step. To generate the ROC curves (Figure S9, Figure S12), run:
 
 ```shell
 # Plot SLiM simulation results
@@ -92,26 +92,20 @@ tsv_s2_maxLR="DL-varS2_maxLR-sites_minMAF.05_200kb_t9x500gen_n40_3h6s_Concatenat
 tsv_s1_target="DL-varS1_selected-sites_minMAF.05_200kb_t9x500gen_n40_1h6s_Concatenated_offGrid_Dist.tsv.gz"
 tsv_s1_maxLR="DL-varS1_maxLR-sites_minMAF.05_200kb_t9x500gen_n40_1h6s_Concatenated_offGrid_Dist.tsv.gz"
 
-## Plot ROCs: (Fig. S8, S11)
 ## Usage:
 ## python step3_plot_Slim_ROCs_fromTSV.py <s2_scores> <s1_scores> <name_prefix>
-### Fig. S8, target sites
 python step3_plot_Slim_ROCs_fromTSV.py ${tsv_s2_target} ${tsv_s1_target} target-sites
-### Fig. S11, maxLR sites
 python step3_plot_Slim_ROCs_fromTSV.py ${tsv_s2_maxLR} ${tsv_s1_maxLR} maxLR-sites
 ```
 <img src="target-sites_200kb_t9x500gen_n40_off-Grid_ROCs.png"/>
 
 <img src="maxLR-sites_200kb_t9x500gen_n40_off-Grid_ROCs.png"/>
 
-To generate boxplots for the accuracy of the MLEs (Fig. S9, Fig. S12), run:
+To generate boxplots for the accuracy of the MLEs (Figure S10, Figure S13), run:
 ```shell
-## Plot boxplots of MLEs: (Fig. S9, S12)
 ## Usage:
 ## python step3_plot_Slim_contrastMLEs_fromTSV.py <s2_scores> <s1_scores> <name_prefix>
-### Fig. S9, target sites
 python step3_plot_Slim_contrastMLEs_fromTSV.py ${tsv_s2_target} ${tsv_s1_target} target-sites
-### Fig. S12, maxLR sites
 python step3_plot_Slim_contrastMLEs_fromTSV.py ${tsv_s2_maxLR} ${tsv_s1_maxLR} maxLR-sites
 ```
 
@@ -120,9 +114,8 @@ python step3_plot_Slim_contrastMLEs_fromTSV.py ${tsv_s2_maxLR} ${tsv_s1_maxLR} m
 <img src="maxLR-sites_200kb_t9x500gen_n40_offGrid_MLEs_contrastBoxes.png"/>
 
 
-Finally, to generate a boxplots that shows the genomic distance from the inferred target of selection to the true target (Fig. S10), run:
+Finally, to generate a boxplots that shows the genomic distance from the inferred target of selection to the true target (Figure S11), run:
 ```shell
-## Plot distance to true target: (Fig. S10)
 ## Usage:
 ## python step3_plot_Slim_pos_dist.py <figname_prefix> <sel_score_s2> <max_score_s2> <sel_score_s1> <max_score_s1> 
 python step3_plot_Slim_pos_dist.py SLiM ${tsv_s2_target} ${tsv_s2_maxLR} ${tsv_s1_target} ${tsv_s1_maxLR}

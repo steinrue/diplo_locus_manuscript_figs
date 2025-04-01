@@ -33,13 +33,15 @@ All scripts in the instructions below are desgined (and tested) for a Unix-style
 The figures in the supplemental material are listed first, since the figures and table in the main text depend on some of these:
 
 #### Supplemental Material:
-* [Fig. S1 - S7: Data simulation and likelihood-based inference](supp_figS1-S7_DLsims)
-* [Fig. S8 - S12: `DiploLocus` likelihood-based inference on `SLiM` simulations](supp_figS8-S12_SLiM)
-* [Fig. S13 - S14: Benchmarking `DiploLocus`](supp_figS13-S14_comparison)
-* [Fig. S15 - S16: Examining genotype data around *LCT* gene in GB population from AADR database](supp_figS15-S16_LCT)
-* [Fig. S17 - S19: Analyzing Evolve & Resequence data for Drosophila simulans](supp_figS17-S19_dsim)
+* [Figure S1 - S7: Data simulation and likelihood-based inference](supp_figS1-S7_DLsims)
+* [Figure S8: Estimate onset of selection](supp_figS8_onset)
+* [Figure S9 - S13: `DiploLocus` likelihood-based inference on `SLiM` simulations](supp_figS9-S13_SLiM)
+* [Figure S14 - S15: Benchmarking `DiploLocus`](supp_figS14-S15_comparison)
+* [Figure S16: Likelihood surfaces for ASIP in horses](supp_figS16_ASIP)
+* [Figure S17 - S18: Examining genotype data around *LCT* gene in GB population from AADR database](supp_figS17-S18_LCT)
+* [Figure S19 - S21: Analyzing Evolve & Resequence data for Drosophila simulans](supp_figS19-S21_dsim)
 
 #### Main text:
-* [Fig. 1: ROC curves an accuracy of MLEs](main_fig1)
-* [Fig. 2: Manhattan plots for human and D. sim data; Likelihood surfaces for rs4988235 in humans and ASIP in horses.](main_fig2)
-* [Tab. 1: Runtimes for benchmarck of `DiploLocus`](main_tab1)
+* [Figure 1: ROC curves an accuracy of MLEs](main_fig1)
+* [Figure 2: Manhattan plots for human and D. sim data; Likelihood surfaces for rs4988235 in humans and ASIP in horses.](main_fig2)
+* [Table 1: Runtimes for benchmarck of `DiploLocus`](main_tab1)

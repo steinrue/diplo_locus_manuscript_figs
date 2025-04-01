@@ -95,7 +95,7 @@ plotSingleChrom <- function(ch, inputname, outputname, statname){
     # maybe label the top SNPs?
     tops <- peak[order(MLR, decreasing=TRUE)]
     tops$logP <- -log10(as.numeric(tops$chi2_p))
-    tops <- tops[logP > 12]
+    tops <- tops[logP > 15]
     print(tops)
     p1 <- p1 + geom_label_repel(data=tops, aes(x=physPos, y=logP, label=rsID), arrow=arrow(length=unit(4, "pt")),
                                   force=20, direction="both", min.segment.length=unit(8, "pt"), segment.linetype=1, #
@@ -105,6 +105,9 @@ plotSingleChrom <- function(ch, inputname, outputname, statname){
   ## draw y=0
   p1 <- p1 + geom_hline(yintercept=0, color='black', linewidth=0.5)
 
+  # set y limit?
+  p1 <- p1 + ylim(0, 20)
+  
   ## add bonferroni line
   p1 <- p1 + geom_hline(yintercept=-log10(0.05/nrow(DT)), color='black', linewidth=0.5, linetype='dashed')
   

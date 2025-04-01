@@ -136,7 +136,9 @@ def initializeHC_simple_msprime(Ne: int or float, L: int or float, mu: float, rh
     rng = np.random.RandomState(master_seed)
     anc_seed, mut_seed = rng.randint(0, 2 ** 32 - 1, 2)
     # simulate trees
-    mstrees = msprime.sim_ancestry(samples={1: int(Ne), 2: int(Ne)},
+    # mstrees = msprime.sim_ancestry(samples={1: int(Ne), 2: int(Ne)},
+    #                                demography=demog, random_seed=anc_seed, recombination_rate=rec_map)
+    mstrees = msprime.sim_ancestry(samples={1: int(Ne), 2: int(Ne)}, model="dtwf",
                                    demography=demog, random_seed=anc_seed, recombination_rate=rec_map)
     # use pyslim to annotate lineages
     mstrees = pyslim.annotate(mstrees, model_type="WF", tick=int(2e5 - 1), stage="late")

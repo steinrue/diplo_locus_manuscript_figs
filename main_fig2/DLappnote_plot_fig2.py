@@ -22,7 +22,9 @@ def _reformat_LL_DF_to_matrix(onGrid_LLs):
 
 
 def plot_ASIP(ax):
-    llFile = 'ex1_ASIP-init_51x51linGrid1e-1_LLmatrices.table'
+    # llFile = 'ex1_ASIP-init_51x51linGrid1e-1_LLmatrices.table'
+    # llFile = '../supp_ASIP/ex1_ASIP_t17000_-init_51x51linGrid1e-1_LLmatrices.table'
+    llFile = '../supp_figS16_ASIP/ex1_ASIP_t13105_-init_51x51linGrid1e-1_LLmatrices.table'
     LLfile = pd.read_csv(llFile, sep="\t", comment="#")
     LLmatrix, loci_name, s1_list, s2_list, s_pairs, num_pairs = _reformat_LL_DF_to_matrix(LLfile)
     asip = LLmatrix[1, :].reshape((len(s2_list), len(s1_list)))
@@ -38,7 +40,8 @@ def plot_ASIP(ax):
     # maxLR = pd.read_csv(mlrFile, sep="\t", comment="%")
     # maxLR.rename(columns={'# locus': 'locus'})
 
-    ct = ax.contour(s1_list, s2_list, asip / np.log(10), levels=40, cmap='copper')  # magma cividis
+    # ct = ax.contour(s1_list, s2_list, asip / np.log(10), levels=40, cmap='copper')  # magma cividis
+    ct = ax.contour(s1_list, s2_list, asip / np.log(10), levels=35, cmap='copper')  # magma cividis
     ax.clabel(ct, ct.levels[1::2], inline=True, fontsize='x-small')
     ax.set_xlabel('$s_{Aa}$')
     ax.set_ylabel('$s_{AA}$')
@@ -224,28 +227,28 @@ def main():
     # panel A: ASIP
     ax['A'] = plot_ASIP(ax['A'])
     ax['A'].tick_params(labelsize=8)
-    ax['A'].set_title('A)', loc='left', fontsize="medium", fontweight='bold')
+    ax['A'].set_title('a', loc='left', fontsize="medium", fontweight='bold')
 
     # panel B: LCT
     ax['B'] = plot_LCT(ax['B'])
     ax['B'].tick_params(labelsize=8)
-    ax['B'].set_title('B)', loc='left', fontsize="medium", fontweight='bold')
+    ax['B'].set_title('b', loc='left', fontsize="medium", fontweight='bold')
 
     # panel C: chr2
-    filename = '../supp_figS15-S16_LCT/v54_chr2_UK_1240K_from4500_MAF.05_fixH.5_51x5e-1geomGrid_off-grid_maxLLs.txt'
+    filename = '../supp_figS17-S18_LCT/v54_chr2_UK_1240K_from4500_MAF.05_fixH.5_51x5e-1geomGrid_off-grid_maxLLs.txt'
     ax['C'] = plot_chr_manhattan(ax['C'], filename, "lct", chrom=2, cutoff=0.05)
     ## de-spine
     sns.despine(ax=ax['C'])
     ax['C'].tick_params(labelsize=8)
-    ax['C'].set_title('C)', loc='left', fontsize="medium", fontweight='bold')  # , fontstyle='bold'
+    ax['C'].set_title('c', loc='left', fontsize="medium", fontweight='bold')  # , fontstyle='bold'
 
     # panel D: dsim
-    filename = '../supp_figS17-S19_dsim/results/analyzed_F0-F60_fisher.pickle.bz2'
+    filename = '../supp_figS19-S21_dsim/results/analyzed_F0-F60_fisher.pickle.bz2'
     ax['D'] = plot_chr_manhattan(ax['D'], filename, "dsim", chrom="2L", cutoff=0.05)
     ## de-spine
     sns.despine(ax=ax['D'])
     ax['D'].tick_params(labelsize=8)
-    ax['D'].set_title('D)', loc='left', fontsize="medium", fontweight='bold')  # , fontstyle='bold'
+    ax['D'].set_title('d', loc='left', fontsize="medium", fontweight='bold')  # , fontstyle='bold'
 
     plt.tight_layout()
     # fig.savefig(figname, dpi=500, transparent=True)

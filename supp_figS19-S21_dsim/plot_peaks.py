@@ -14,6 +14,8 @@ FISHER_PVALUES_FILE = pathlib.Path ("results/analyzed_F0-F60_fisher.pickle.bz2")
 M252_ORIGINAL_ANNOTATIONS_FILE = pathlib.Path ("dsim-M252-popgen-ann-r1.1.gtf")
 # store processed annotations here
 M252_PROCESSED_ANNOTATIONS_FILE = pathlib.Path ("chr2L_processed_annotations.pickle.bz2")
+# here are the real names for the relevant genes
+FLYBASE_GENE_NAMES_FILE = pathlib.Path ("flybase_gene_names.txt")
 
 # plot regions on this chromosome
 PLOT_CHR = 'chr2L'
@@ -102,7 +104,7 @@ def loadM252Annotations():
     return dsimFullAnnoFrame
 
 
-def plotRegionsGeneTrack (pos, logPValues, bfThres, dsimFullAnnoFrame):
+def plotRegionsGeneTrack (pos, logPValues, bfThres, dsimFullAnnoFrame, flybaseToGene):
 
     print ("[COLLECT_GENE_COORDS]")
     # it helps to have a reduced frame just for the gene coordinates
@@ -171,6 +173,15 @@ def plotRegionsGeneTrack (pos, logPValues, bfThres, dsimFullAnnoFrame):
             # any gene that overlaps wiith our plotregion gets plotted
             if (((plotRegion[0] < thisGene["start"]) and (thisGene["start"] < plotRegion[1])) or
                 ((plotRegion[0] < thisGene["end"]) and (thisGene["end"] < plotRegion[1]))):
+
+                # but we don't plot it if it has no name
+                thisGeneId = thisGene["gene_id"]
+                realGeneName = thisGeneId
+                if (thisGeneId in flybaseToGene):
+                    realGeneName = flybaseToGene[thisGeneId]
+                    if (realGeneName == "na"):
+                        continue
+
                 yPos = trackY * offset
                 offset += 1
                 trackStart = max(thisGene["start"], plotRegion[0])
@@ -183,21 +194,20 @@ def plotRegionsGeneTrack (pos, logPValues, bfThres, dsimFullAnnoFrame):
                     ax.plot ([trackEnd], [yPos], marker='.', color='C2')
 
                 # and maybe some exons?
-                thisGeneId = thisGene["gene_id"]
                 thisGeneFrame = dsimFullAnnoFrame[dsimFullAnnoFrame['gene_id'] == thisGeneId]
                 exonOnlyFrame = thisGeneFrame[thisGeneFrame['feature'] == 'exon']
                 for thisExon in list(zip (exonOnlyFrame['start'], exonOnlyFrame['end'])):
                     ax.plot ([thisExon[0],thisExon[1]], [yPos, yPos], ls='-', lw=7, color='C2', solid_capstyle="butt")
 
                 # put label of gene in plot
-                ax.text (trackStart, yPos + trackText, thisGeneId, clip_on=True)
+                ax.text (trackStart, yPos + trackText, realGeneName, clip_on=True)
 
                 # print gene id if within +/- 10kb of significant region
                 printRegion = (minExceed  - 1e4, maxExceed + 1e4)
                 if (((printRegion[0] < thisGene["start"]) and (thisGene["start"] < printRegion[1])) or
                     ((printRegion[0] < thisGene["end"]) and (thisGene["end"] < printRegion[1]))):
                     # print (thisGeneId, (thisGene["start"], thisGene["end"]))
-                    print (thisGeneId)
+                    print (f"{thisGeneId} -> {realGeneName}")
 
         # labels and limits
         ax.set_xlim (plotRegion[0], plotRegion[1])
@@ -207,6 +217,21 @@ def plotRegionsGeneTrack (pos, logPValues, bfThres, dsimFullAnnoFrame):
         # save plot
         fig.tight_layout()
         fig.savefig (PLOT_FILENAMES[rIdx])
+
+
+def loadFlybaseGeneNames():
+
+    # load the file
+    nameFrame = pandas.read_csv (str(FLYBASE_GENE_NAMES_FILE), sep='\t', header=None, index_col=False)
+
+    # build a dictionary
+    flybaseToGene = {}
+    for nameRow in nameFrame.iterrows():
+        flybaseToGene[str(nameRow[1][0])] = str(nameRow[1][1])
+
+    # and return it
+    # print (flybaseToGene)
+    return flybaseToGene
 
 
 def main():
@@ -221,9 +246,14 @@ def main():
     dsimFullAnnoFrame = loadM252Annotations()
     print ("[LOAD_ANNOTATIONS_DONE]")
 
+    # load real gene names
+    print ("[LOAD_REAL_NAMES]")
+    flybaseToGene = loadFlybaseGeneNames()
+    print ("[LOAD_REAL_NAMES_DONE]")
+
     # make the zoomed plots for both peaks
     print ("[PLOT_REGIONS]")
-    plotRegionsGeneTrack (positions, logPValues, bfThres, dsimFullAnnoFrame)
+    plotRegionsGeneTrack (positions, logPValues, bfThres, dsimFullAnnoFrame, flybaseToGene)
     print ("[PLOT_REGIONS_DONE]")
 
 
